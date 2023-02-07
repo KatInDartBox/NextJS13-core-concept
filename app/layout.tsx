@@ -1,18 +1,19 @@
-import './globals.css'
+import "./globals.css";
+import HeadNav from "./(appGroup)/headNav";
+import Loading from "./(appGroup)/loading";
+type tProps = {
+  children: React.ReactNode;
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: tProps) {
   return (
-    <html lang="en">
-      {/*
-        <head /> will contain the components returned by the nearest parent
-        head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-      */}
-      <head />
-      <body>{children}</body>
-    </html>
-  )
+    <>
+      <html lang="en">
+        <body>
+          <HeadNav />
+          {children}
+        </body>
+      </html>
+    </>
+  );
 }
