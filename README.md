@@ -1,38 +1,93 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# nextJs
 
-## Getting Started
+another react framework on the back.
 
-First, run the development server:
+## install
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+- #### next 13 stable
+
+```js
+// automatic setup
+// required nodejs >= v14
+npx create-next-app@latest
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- #### next 13 experimental (beta)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```js
+// now 2023-01-26 version 13(beta)
+// required nodejs >= v16.8.0
+// after install the stable version
+// just add the following to next.config.js
+// file: next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    appDir: true,
+  },
+};
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+module.exports = nextConfig;
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- #### use turbopack instead of webpack
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+inside package.json add the following line
+pls note that turbopack is in alpha version, which mean there will be bugs.
 
-## Learn More
+```js
+// file: package.json
+"scripts": {
+    "dev": "next dev --turbo",
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+- ### NextJs caching
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Next13 will no longer support getStaticProps getServerSideProps or
+getStaticPaths
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- #### getStaticProps -> force-cache
 
-## Deploy on Vercel
+```js
+await fetch(`https://...`, { cache: "force-cache" });
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- #### getServerSideProps -> no-store
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```js
+await fetch(`https://...`, { cache: "no-store" });
+```
+
+- #### ISR(Incremental Static Regeneration) -> next: { revalidate: 10 }
+
+```js
+await fetch(`https://...`, { next: { revalidate: 10 } });
+```
+
+- #### getStaticPaths -> generateStaticParams
+
+for the sake of change nextJs replace getStaticPaths to generateStaticParams
+the same purpose, but different api, just to embrace change.
+
+```js
+export async function generateStaticParams() {
+  const posts = await getPosts();
+
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
+```
+
+- #### cannot access to fetch
+
+if we are using other module such as prisma to query database,
+on top of page file export the following
+
+```js
+export const revalidate = false; // false  | 0 | number
+// false for 'force-cache'
+// 0 for for 'no-store'
+// number for Incremental Static Regeneration
+```
